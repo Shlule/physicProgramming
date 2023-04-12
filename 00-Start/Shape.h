@@ -1,14 +1,18 @@
 #pragma once
+#include "code/Math/Matrix.h"
+#include "code/Math/Bounds.h"
+#include "code/Math/Quat.h"
+
 class Shape {
 public:
 	enum class ShapeType
 	{
-		SHAPE_SPHERE,
+		SHAPE_SPHERE
 	};
 
 	virtual ShapeType GetType() const = 0;
 	virtual Mat3 InertialTensor() const = 0;
-	virtual Vec3 GetCenterOfMass() const { return centerOfMass; };
+	virtual Vec3 GetCenterOfMass() const { return centerOfMass; }
 	
 
 protected:
@@ -23,8 +27,9 @@ public:
 		centerOfMass.Zero();
 	}
 
-	Mat3 InertialTensor() const override;
+	
 	ShapeType GetType() const override { return ShapeType::SHAPE_SPHERE; }
+	Mat3 InertialTensor() const override;
 	float radius;
 };
 

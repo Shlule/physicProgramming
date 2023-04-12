@@ -10,6 +10,7 @@ public:
 	Quat orientation;
 	Vec3 linearVelocity;
 	Vec3 angularVelocity;
+	float friction;
 	float inverseMass;
 	float elasticity;
 	Shape* shape;
@@ -26,6 +27,11 @@ public:
 
 	Mat3 GetInverseInertialTensorBodySpace() const;
 	Mat3 GetInverseInertialTensorWorldSpace() const;
+
+	void applyImpulse(const Vec3& impulsePoint, const Vec3& impulse);
+
+	void Update(const float dt_sec);
+
 };
 
 

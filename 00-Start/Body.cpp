@@ -57,3 +57,46 @@ void Body::ApplyImpulseAngular(const Vec3& impulse) {
 		angularVelocity *= maxAngularSpeed;
 	}
 }
+
+void Body::applyImpulse(const Vec3& impulsePoint, const Vec3& impulse) {
+	if (inverseMass == 0.0f) return;
+	ApplyImpulseLinear(impulse);
+
+	// Applying impulse must produce torques through the center of mass
+	Vec3 position = GetCenterOfMassWorldSpace();
+	Vec3 r = impulsePoint - position;
+	Vec3 dL = r.Cross(impulse); // world Space
+	ApplyImpulseAngular(dL);
+}
+
+void Body::Update(const float dt_sec) {
+	position += linearVelocity * dt_sec;
+
+	// We have an angular velocity around the center of mass,
+// this needs to be converted to relative to model position.
+// This way we can properly update the orientation
+// of the model
+	Vec3 positionCM = GetCenterOfMassWorldSpace();
+	Vec3 CMToPosition = position - positionCM; 
+
+	// Total torques is equal to external applied
+// torques + internal torque (precession)
+// T = Texternal + w x I * w
+// Texternal = 0 because it was applied in the collision
+// response function
+// T = Ia = w x I * w
+// a = I^-1 (w x I * w)
+	Mat3 orientationMat = orientation.ToMat3();
+	Mat3 inertialTensor = orientationMat * shape->InertialTensor() * orientationMat.Transpose();
+	Vec3 alpha = inertialTensor.Inverse() * (angularVelocity.Cross(inertialTensor * angularVelocity));
+	angularVelocity == alpha * dt_sec;
+
+
+	// Update orientation
+	Vec3 dAngle = angularVelocity * dt_sec;
+	Quat dq = Quat(dAngle, dAngle.GetMagnitude());
+	orientation = dq * orientation;
+	orientation.Normalize();
+	// Get the new model position
+	position = positionCM + dq.RotatePoint(CMToPosition);
+}
