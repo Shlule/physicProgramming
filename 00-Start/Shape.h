@@ -13,6 +13,8 @@ public:
 	virtual ShapeType GetType() const = 0;
 	virtual Mat3 InertialTensor() const = 0;
 	virtual Vec3 GetCenterOfMass() const { return centerOfMass; }
+	virtual Bounds GetBounds(const Vec3& pos, const Quat& orient) const = 0;
+	virtual Bounds GetBounds() const = 0;
 	
 
 protected:
@@ -31,5 +33,8 @@ public:
 	ShapeType GetType() const override { return ShapeType::SHAPE_SPHERE; }
 	Mat3 InertialTensor() const override;
 	float radius;
+
+	Bounds GetBounds(const Vec3& pos, const Quat& orient)const override;
+	Bounds GetBounds() const override;
 };
 
